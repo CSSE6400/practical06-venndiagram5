@@ -52,35 +52,40 @@ resource "aws_ecs_service" "taskoverflow" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets             = data.aws_subnets.private.ids
-    security_groups     = [aws_security_group.todo.id]
-    assign_public_ip    = true
+    subnets          = data.aws_subnets.private.ids
+    security_groups  = [aws_security_group.todo.id]
+    assign_public_ip = true
+  }
+  load_balancer {
+    target_group_arn = aws_lb_target_group.todo.arn
+    container_name   = "todo"
+    container_port   = 6400
   }
 
 }
 
 resource "aws_security_group" "todo" {
-  name = "todo"
+  name        = "todo"
   description = "TaskOverflow Security Group"
 
   ingress {
-    from_port = 6400
-    to_port = 6400
-    protocol = "tcp"
+    from_port   = 6400
+    to_port     = 6400
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
